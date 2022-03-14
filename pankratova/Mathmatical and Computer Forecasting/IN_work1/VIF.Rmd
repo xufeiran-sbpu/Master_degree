@@ -1,0 +1,81 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+Load package
+```{r}
+library(readxl)
+```
+```{r}
+read_excel('./boston.xlsx',sheet = 1) ->boston 
+
+x1<-boston$CRIM
+x2<-boston$INDUS
+x3<-boston$NOX
+x4<-boston$RM
+x5<-boston$AGE
+x6<-boston$DIS
+x7<-boston$PTRATIO
+x8<-boston$B
+x9<-boston$LSTAT
+y<-boston$MEDV
+
+lm(y~x1+x2+x3+x4+x5+x6+x7+x8+x9,boston)->boston.lr
+
+library(car)
+library(carData)
+library(car)
+
+summary(boston.lr)
+##car::vif(denver.population.lr)
+```
+```{r}
+car::vif(boston.lr)
+```
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+```{r}
+read_excel('./boston.xlsx') ->boston 
+boston_subset = subset(boston,select = c(NOX,AGE,RM,PTRATIO,LSTAT))
+library(MASS)
+lm(y~.,boston_subset)->boston.full.mode
+lm(y~1,boston_subset)->boston.null.mode
+stepAIC(boston.model,direction = "both",trace = 1,scope=list(lower=boston.null.mode,                                           upper=boston.full.mode))->boston.selected.model 
+
+```
+
+
+```{r}
+library(dplyr)
+newdata <- select(boston,CRIM, INDUS, NOX, RM, AGE,DIS,PTRATIO,B,LSTAT,MEDV)
+boston_<-scale(newdata,center = T,scale = T)
+write.csv(boston_,file="E:/pmpu/pmpu/pankratova/Mathmatical and Computer Forecasting/IN_work1/sd.csv")
+
+```
+
+```{r}
+read_excel('./boston.xlsx') ->boston 
+library(carData)
+library(car)
+ncvTest(boston.lr)
+
+
+
+```
+install.packages("tseries")
+```{r}
+
+library(tseries)
+e<-err$err
+ar<-jarque.bera.test(e)
+ar
+```
